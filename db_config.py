@@ -16,6 +16,7 @@ engine = create_engine(
 
 SessionLocal = sessionmaker(bind=engine)
 
+
 # engine = create_engine(
 #     f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?charset=utf8mb4",
 #     echo=False
