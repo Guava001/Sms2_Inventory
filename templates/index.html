@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SMS Inventory System</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+
+    <style>
+        /* Base Styles */
+        body {
+    background-color: #999393aa; /* Slightly darker neutral grey */
+    color: #333;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.container {
+    max-width: 700px;
+    background-color: #e0d0d0; /* Keeps the form bright */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08); /* Slightly stronger shadow for contrast */
+}
+
+
+        h3 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #222;
+        }
+
+        .container {
+            max-width: 700px;
+            background-color: #ffffff; /* White card-like container */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        label {
+            font-weight: 500;
+            margin-top: 15px;
+        }
+
+        .form-control, .select2-container--default .select2-selection--single {
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            background-color: #fdfdfd;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+
+        .form-control:focus, .select2-container--default .select2-selection--single:focus {
+            border-color: #888;
+            box-shadow: 0 0 5px rgba(136,136,136,0.2);
+        }
+
+        .btn-primary {
+            background-color: #6c757d; /* Muted neutral color */
+            border-color: #6c757d;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+        }
+
+        .btn-outline-primary {
+            border-radius: 8px;
+            border-color: #888;
+            color: #555;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #eaeaea;
+            color: #333;
+        }
+
+        .alert {
+            border-radius: 8px;
+        }
+
+        small.text-muted {
+            color: #666;
+        }
+
+        p span {
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body class="d-flex justify-content-center mt-5">
+
+<div class="container">
+
+    <h3>SMS Electrical Store – Inventory Transaction</h3>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <a href="/transactions" class="btn btn-outline-primary mb-3">
+        View Transaction Log
+    </a>
+
+    <form method="POST">
+
+        <label>Item</label>
+        <select id="item" name="item_id" class="form-control" required>
+            {% for item in items %}
+            <option value="{{ item.id }}">{{ item.item_name }}</option>
+            {% endfor %}
+        </select>
+
+        <p class="mt-2">
+            <strong>Cupboard:</strong> <span id="cupboard"></span><br>
+            <strong>Available Qty:</strong> <span id="available_qty"></span>
+        </p>
+
+        <label>IN / OUT</label>
+        <select name="action" class="form-control">
+            <option value="OUT">OUT</option>
+            <option value="IN">IN</option>
+        </select>
+
+        <label class="mt-2">Quantity</label>
+        <input type="number" name="qty" class="form-control" required>
+
+        <label class="mt-2">Taken By (Emp ID)</label>
+        <input type="text" id="taken_by" name="taken_by" class="form-control" required>
+        <small id="taken_name" class="text-muted"></small>
+
+        <button class="btn btn-primary mt-3">Submit</button>
+    </form>
+</div>
+
+<script>
+$(document).ready(function() {
+
+    $('#item').change(function() {
+        let id = $(this).val();
+        $.getJSON('/get_item/' + id, function(data) {
+            $('#available_qty').text(data.quantity);
+            $('#cupboard').text(data.cupboard);
+        });
+    }).trigger('change');
+
+    $('#taken_by').on('input', function() {
+        $.getJSON('/get_employee/' + $(this).val(), function(data) {
+            $('#taken_name').text(data.name);
+        });
+    });
+
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
